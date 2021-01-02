@@ -1,5 +1,5 @@
 # strava-uploader
-Simple python script for activity uploads using Strava API (v3_
+Simple python script for activity uploads using Strava v3 API
 
 
 See 
