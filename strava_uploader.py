@@ -1,7 +1,8 @@
 import os, subprocess, requests, shutil
 
 activities = []
-# ACCESS_TOKEN = a1195b8e1532140ba73d4e297a0d879ea707910d
+ACCESS_TOKEN = 'token_goes_here'
+
 def getFilesAndWriteList():
 
   global activities
@@ -14,12 +15,12 @@ def getFilesAndWriteList():
   f.write(output)
   f.close()
 
-
   with open('filestoprocess.txt', 'r') as source:
     activities = [line.strip() for line in source]
 
 
 def uploadAndMove():
+  global ACCESS_TOKEN
   print(len(activities))
 
   url = 'https://www.strava.com/api/v3/uploads'
@@ -30,12 +31,17 @@ def uploadAndMove():
     print(activity)
     
     files = {'file': open(activity, 'rb')}
-    headers = {'Authorization': 'Bearer a1195b8e1532140ba73d4e297a0d879ea707910d'}
+    headers = {'Authorization': 'Bearer '+ACCESS_TOKEN}
     r = requests.post(url, headers=headers, params=payload, files=files)
     print(r.url)
     print(r.json())
-    print('processed!')
+    print(r.status_code)
+    
+    if (r.status_code != 201):
+      print('error!')
+      break
 
+    print('processed!')
     shutil.move(activity, "./processed/"+activity)
     print('moved')
     i += 1
