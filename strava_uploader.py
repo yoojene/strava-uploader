@@ -1,4 +1,8 @@
-import os, subprocess, requests, shutil
+import os
+import subprocess
+import requests
+import shutil
+from datetime import datetime
 
 activities = []
 ACCESS_TOKEN = 'token_goes_here'
@@ -6,7 +10,7 @@ ACCESS_TOKEN = 'token_goes_here'
 def getFilesAndWriteList():
 
   global activities
-  process = subprocess.Popen(('ls'),stdout=subprocess.PIPE)
+  process = subprocess.Popen(('ls'), stdout=subprocess.PIPE)
   output = subprocess.check_output(
       ('grep', 'tcx'), stdin=process.stdout, universal_newlines=True)
   process.wait
@@ -29,23 +33,25 @@ def uploadAndMove():
   i = 0
   for activity in activities:
     print(activity)
-    
+
     files = {'file': open(activity, 'rb')}
     headers = {'Authorization': 'Bearer '+ACCESS_TOKEN}
     r = requests.post(url, headers=headers, params=payload, files=files)
-    print(r.url)
     print(r.json())
     print(r.status_code)
-    
+
     if (r.status_code != 201):
-      print('error!')
+      now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+      print('error at ' + now)
       break
 
     print('processed!')
+
     shutil.move(activity, "./processed/"+activity)
+
     print('moved')
     i += 1
-    if i == 100: # 100 files per 15 mins rate limit
+    if i == 100:  # 100 files per 15 mins rate limit
       break
 
 getFilesAndWriteList()
